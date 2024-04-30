@@ -1,3 +1,4 @@
+import pandas as pd
 from ultralytics import YOLO
 import cv2
 import pickle
@@ -8,6 +9,22 @@ __all__ = ['BallTracker']
 class BallTracker:
     def __init__(self, model_path: str):
         self.model = YOLO(model_path)
+
+    def interpolate_ball_positions(self, ball_positions):
+        # list of bounding boxes which is going to be empty if there is no ball
+        ball_positions = [x.get(1, []) for x in ball_positions]
+        # convert the list into pandas dataframe
+        df_ball_positions = pd.DataFrame(ball_positions, columns=['x1', 'y1', 'x2', 'y2'])
+        # interpolate the missing values
+        df_ball_positions = df_ball_positions.interpolate(method='quadratic')
+        # duplicate the first frames in order to not have empty first values which will crash the program
+        # bfill - Fill NA/NaN values by using the next valid observation to fill the gap.
+        df_ball_positions = df_ball_positions.bfill()
+        # convert back into the same format that we got the detections from
+        # list of dicts where 1 is id and x is the bounding box
+        ball_positions = [{1: x} for x in df_ball_positions.to_numpy().tolist()]
+
+        return ball_positions
 
     def detect_frames(self, frames, read_from_stub=False, stub_path=None):
         ball_detections = []
