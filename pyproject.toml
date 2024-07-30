@@ -2,7 +2,7 @@
 name = "ai-tennis-game-analysis"
 version = "0.1.0"
 description = "Tennis game analysis using AI models such as YOLO."
-authors = ["Szymon-Budziak <szymonbudziak@gmail.com>"]
+authors = ["Szymon-Budziak"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "tennis_ai", from = "src" }]
